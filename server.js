@@ -1,14 +1,9 @@
-const express = require('express');
 const mysql = require('mysql2');
 const cTable = require('console.table');
 const inquirer= require('inquirer');
-
-const PORT = process.env.PORT || 3001;
-const app = express();
-
-// express middlewares
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+const Department = require('./lib/department');
+const Employee = require('./lib/employee');
+const Role = require('./lib/role');
 
 const db = mysql.createConnection(
     {
@@ -17,9 +12,10 @@ const db = mysql.createConnection(
       password: 'newpassword',
       database: 'employees_database'
     },
+    console.log("Connected to the Employee Database.")
 );
 
-function accessdatabase() {
+function loginDB() {
     console.log ("Welcome to the Employee Database!")
     inquirer
         .prompt([
@@ -27,7 +23,7 @@ function accessdatabase() {
                 type: "list",
                 name: "action",
                 message: "What would you like to do?",
-                Choices: [
+                choices: [
                     {value: "View All Employees"},
                     {value: "Add Employee"},
                     {value: "Update Employee Role"},
@@ -45,67 +41,72 @@ function accessdatabase() {
                     {value: "Quit"}
                 ]
             }
+        ])
         .then((answer) => {
-            console.log("hi");
-            switch (answer.choices) {
+            switch (answer.choice) {
                 case "View All Employees":
-                    viewAllEmployees();
+                    Employee.viewAllEmployees();
                     break;
+
                 case "Add Employee":
-                    addEmployee();
+                    Employee.addEmployee();
                     break;
+
                 case "Update Employee Role":
-                    updateRole();
+                    Role.updateRole();
                     break;
+
                 case "View All Employee Roles":
-                    viewAllRoles();
+                    Role.viewAllRoles();
                     break;
+
                 case "Add Role":
-                    addRole();
+                    Role.addRole();
                     break;
+
                 case "View All Departments":
-                    viewAllDepartments();
+                    Department.viewAllDepartments();
                     break;
+
                 case "Add Department":
-                    addDepartment();
+                    Department.addDepartment();
                     break;
+
                 case "Update Employee Managers":
-                    updateManager();
+                    Employee.updateManager();
                     break;
+
                 case "View Employees by Manager":
-                    viewEmployeeByManager();
+                    Employee.viewEmployeeByManager();
                     break;
+
                 case "View Employees by Department":
-                    viewEmployeeByDepartment();
+                    Employee.viewEmployeeByDepartment();
                     break;
+
                 case "Delete Employee":
-                    deleteEmployee();
+                    Employee.deleteEmployee();
                     break;
+
                 case "Delete Role":
-                    deleteRole();
+                    Role.deleteRole();
                     break;
+
                 case "Delete Department":
-                    deleteDepartment();
+                    Department.deleteDepartment();
                     break;
+
                 case "View the Total Utilized Budget of a Department":
-                    viewDepartmentBudget()
+                    Department.viewDepartmentBudget()
                     break;
+
                 case "Quit":
                     db.end();
-                    console.log("Leaving database..")
                     break;
             }
         })
-        ])
 }
 
 
-app.use((req, res) => {
-    res.status(404).end();
-  });
-  
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
 
-  accessdatabase();
+loginDB();
