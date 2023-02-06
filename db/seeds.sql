@@ -1,5 +1,5 @@
 INSERT INTO Department (name)
-VALUES ("Engineer"),
+VALUES ("Engineering"),
        ("Finance"),
        ("Legal"),
        ("Sales");

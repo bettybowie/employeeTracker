@@ -16,7 +16,7 @@ const db = mysql.createConnection(
 );
 
 function loginDB() {
-    console.log ("Welcome to the Employee Database!")
+    console.log ("Welcome to the Employee Database!");
     inquirer
         .prompt([
             {
@@ -42,10 +42,12 @@ function loginDB() {
                 ]
             }
         ])
-        .then((answer) => {
+        .then(answer => {
+
             switch (answer.choice) {
                 case "View All Employees":
-                    Employee.viewAllEmployees();
+                    viewAllEmployees();
+                    // Employee.viewAllEmployees();
                     break;
 
                 case "Add Employee":
@@ -61,7 +63,7 @@ function loginDB() {
                     break;
 
                 case "Add Role":
-                    Role.addRole();
+                    Employee.addRole();
                     break;
 
                 case "View All Departments":
