@@ -44,62 +44,61 @@ function loginDB() {
         ])
         .then(answer => {
 
-            switch (answer.choice) {
+            switch (answer.action) {
                 case "View All Employees":
                     viewAllEmployees();
-                    // Employee.viewAllEmployees();
                     break;
 
                 case "Add Employee":
-                    Employee.addEmployee();
+                    addEmployee();
                     break;
 
                 case "Update Employee Role":
-                    Role.updateRole();
+                    updateRole();
                     break;
 
                 case "View All Employee Roles":
-                    Role.viewAllRoles();
+                    viewAllRoles();
                     break;
 
                 case "Add Role":
-                    Employee.addRole();
+                    addRole();
                     break;
 
                 case "View All Departments":
-                    Department.viewAllDepartments();
+                    viewAllDepartments();
                     break;
 
                 case "Add Department":
-                    Department.addDepartment();
+                    addDepartment();
                     break;
 
                 case "Update Employee Managers":
-                    Employee.updateManager();
+                    updateManager();
                     break;
 
                 case "View Employees by Manager":
-                    Employee.viewEmployeeByManager();
+                    viewEmployeeByManager();
                     break;
 
                 case "View Employees by Department":
-                    Employee.viewEmployeeByDepartment();
+                    viewEmployeeByDepartment();
                     break;
 
                 case "Delete Employee":
-                    Employee.deleteEmployee();
+                    deleteEmployee();
                     break;
 
                 case "Delete Role":
-                    Role.deleteRole();
+                    deleteRole();
                     break;
 
                 case "Delete Department":
-                    Department.deleteDepartment();
+                    deleteDepartment();
                     break;
 
                 case "View the Total Utilized Budget of a Department":
-                    Department.viewDepartmentBudget()
+                    viewDepartmentBudget()
                     break;
 
                 case "Quit":
@@ -107,6 +106,213 @@ function loginDB() {
                     break;
             }
         })
+}
+
+// done
+function viewAllEmployees() {
+    const query = `SELECT Employee.id as ID, Employee.first_name as First_name, Employee.last_name as Last_name, Role.title as Title, Department.name as Department, Role.salary as Salary, CONCAT(manager.first_name,' ', manager.last_name) as Manager 
+    FROM Employee
+    LEFT JOIN Employee manager ON manager.id = Employee.manager_id
+    JOIN Role ON Role.id = Employee.role_id
+    JOIN Department ON Department.id = Role.department_id;`;
+    db.query(query, (err, res) => {
+        if (err) {
+            throw err;
+        }
+        console.table(res);
+        loginDB();
+    })
+}
+
+// help
+function addEmployee() {
+    inquirer
+    .prompt([
+        {
+            type: "input",
+            name: "firstName",
+            message: "What is the first name of the new employee?"
+        },
+        {
+            type: "input",
+            name: "lastName",
+            message: "What is the last name of the new employee?"
+        },
+        {
+            type: "list",
+            name: "manager",
+            message: "Who is the manager of the new employee?",
+            choices: "managerlist"
+        },
+        {
+            type: "list",
+            name: "role",
+            message: "What is the role of the new employee?",
+            choices: "rolelist"
+        }
+    ])
+    .then(response => {
+        const query = `INSERT INTO Employee (first_name, last_name, role_id, manager_id)
+        VALUES (${response.firstName}, ${response.lastName}, );`;
+        db.query(query, (err, res) => {
+            if (err) {
+                throw err;
+            }
+            console.log("New employee has been added to the database.");
+            loginDB();
+        }) 
+    })
+}
+
+// help
+function updateRole() {
+    inquirer
+    .prompt([
+        {
+            type: "list",
+            name: "employee",
+            message: "Which employee's role would you like to update?",
+            choices: "employeeslist"
+        },
+        {
+            type: "list",
+            name: "role",
+            message: "What is the new role for this employee?",
+            choices: "role list"
+        }
+    ])
+    .then(response => {
+        const query =``;
+        db.query(query, (err, res) => {
+            if (err) {
+                throw err;
+            }
+            console.log("Employee's new role updated.");
+            loginDB();
+        })
+    })
+}
+
+// done
+function viewAllRoles() {
+    const query = `SELECT Role.id as ID, Role.title as Title, Department.name as Department, Role.salary as Salary 
+    FROM Role
+    JOIN Department ON Role.department_id = Department.id;`;
+    db.query(query, (err, res) => {
+        if (err) {
+            throw err;
+        }
+        console.table(res);
+        loginDB();
+    })
+}
+
+// help
+function addRole() {
+    inquirer
+        .prompt([
+            {
+                type: "input",
+                name: "title",
+                message: "What is the name for the new role?"
+            },
+            {
+                type: "input",
+                name: "salary",
+                message: "What is the salary for the new role?"
+            },
+            {
+                type: "list",
+                name: "department",
+                message: "What is the department for the new role?",
+                choices: "department list"
+            }
+        ])
+        .then(response => {
+            const query = `INSERT INTO Role (title, salary, department_id)
+            VALUES ("${response.title}, ${response.salary}");`;
+            db.query(query, (err, res) => {
+                if (err) {
+                    throw err;
+                }
+                console.log("New role hsa been added to database.");
+                loginDB();
+            }) 
+        })
+}
+
+// done
+function viewAllDepartments() {
+    db.query("SELECT * FROM DEPARTMENT", (err, res) => {
+        if (err) {
+            throw err;
+        }
+        console.table(res);
+        loginDB();
+    }) 
+}
+
+// done
+function addDepartment() {
+    inquirer
+        .prompt([
+            {
+                type: "input",
+                name: "newDepartment",
+                message: "What is the name for the new department?"
+            }
+        ])
+        .then(response => {
+            const query = `INSERT INTO Department (name)
+            VALUES ("${response.newDepartment}");`;
+            db.query(query, (err, res) => {
+                if (err) {
+                    throw err;
+                }
+                console.log(`${response.newDepartment} added to database. `);
+                loginDB();
+            }) 
+        })
+}
+
+// done
+function viewDepartmentBudget() {
+    const query = `SELECT Department.name as Department, SUM(salary) AS Total_Budget
+    FROM Role
+    JOIN Department ON Role.department_id = Department.id
+    GROUP BY department_id;`;
+            db.query(query, (err, res) => {
+                if (err) {
+                    throw err;
+                }
+                console.table(res);
+                loginDB();
+            }) 
+}
+
+
+function updateManager() {
+
+}
+
+function deleteEmployee() {
+
+}
+
+function viewEmployeeByManager() {
+    
+}
+
+function viewEmployeeByDepartment() {
+    
+}
+
+function deleteRole() {
+
+}
+
+function deleteDepartment() {
+
 }
 
 
