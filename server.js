@@ -179,6 +179,7 @@ function addEmployee() {
                             throw err;
                         }
                         console.log("New employee has been added to the database.");
+                        console.log("==================================================");
                         loginDB();
                     })
                 })
@@ -234,7 +235,8 @@ function updateRole() {
                                     throw err;
                                 }
 
-                                console.log("Employee's new role updated.");
+                                console.log("Employee's new role has been updated.");
+                                console.log("==================================================");
                                 loginDB();
                             })
                         })
@@ -252,12 +254,7 @@ function viewAllRoles() {
         if (err) {
             throw err;
         }
-        console.log(res);
-        const roles = res.map(role => ({
-            name: role.Title,
-            value: role.ID
-        }))
-        console.log(roles);
+        console.table(res);
         loginDB();
     })
 }
@@ -300,7 +297,8 @@ function addRole() {
                     if (err) {
                         throw err;
                     }
-                    console.log("New role hsa been added to database.");
+                    console.log(`New role, ${response.title},has been added to database.`);
+                    console.log("==================================================");
                     loginDB();
                 })
             })
@@ -335,7 +333,8 @@ function addDepartment() {
                 if (err) {
                     throw err;
                 }
-                console.log(`${response.newDepartment} added to database. `);
+                console.log(`${response.newDepartment} department has been added to database. `);
+                console.log("==================================================");
                 loginDB();
             })
         })
@@ -395,7 +394,8 @@ function updateManager() {
                     if (err) {
                         throw err;
                     }
-                    console.log("Employee's new manager updated.");
+                    console.log("Employee's new manager has been updated.");
+                    console.log("==================================================");
                     loginDB();
                 })
             })
@@ -429,29 +429,155 @@ function deleteEmployee() {
                     if (err) {
                         throw err;
                     }
-                    console.log("Employee is removed from database.");
+                    console.log("Employee has been removed from database.");
+                    console.log("==================================================");
                     loginDB();
                 })
             })
     })
 }
 
+// done
 function viewEmployeeByManager() {
+    const managerQuery = `SELECT id, first_name, last_name FROM Employee`;
+    db.query(managerQuery, (err, res) => {
+        if (err) {
+            throw err;
+        }
+        const managers = res.map(manager => ({
+            name: `${manager.first_name} ${manager.last_name}`,
+            value: manager.id
+        }))
 
+        inquirer
+            .prompt([
+                {
+                    type: "list",
+                    name: "manager_id",
+                    message: "Which manager would you like to view the employees by?",
+                    choices: managers
+                }
+            ])
+            .then(response => {
+                const query = `SELECT * FROM Employee WHERE manager_id = ${response.manager_id}`;
+                db.query(query, (err, res) => {
+                    if (err) {
+                        throw err;
+                    }
+                    console.table(res);
+                    loginDB();
+                })
+            })
+    })
 }
 
+//done
 function viewEmployeeByDepartment() {
+    const departmentQuery = `SELECT * From Department`;
+    db.query(departmentQuery, (err, res) => {
+        if (err) {
+            throw err;
+        }
+        const departments = res.map(department => ({
+            name: `${department.name}`,
+            value: department.id
+        }))
 
+        inquirer
+            .prompt([
+                {
+                    type: "list",
+                    name: "department_id",
+                    message: "Which department would you like to view the employees by?",
+                    choices: departments
+                }
+            ])
+            .then(response => {
+                const query = `SELECT Employee.id as ID, Employee.first_name as First_name, Employee.last_name as Last_name, Role.title as Title, Department.name as Department, Role.salary as Salary, CONCAT(manager.first_name,' ', manager.last_name) as Manager 
+                FROM Employee
+                LEFT JOIN Employee manager ON manager.id = Employee.manager_id
+                JOIN Role ON Role.id = Employee.role_id
+                JOIN Department ON Department.id = Role.department_id
+                WHERE Department_id=${response.department_id};`;
+                db.query(query, (err, res) => {
+                    if (err) {
+                        throw err;
+                    }
+                    console.table(res);
+                    loginDB();
+                })
+            })
+    })
 }
 
+// done
 function deleteRole() {
+    const roleQuery = `Select * FROM Role`;
+    db.query(roleQuery, (err, res) => {
+        if (err) {
+            throw err;
+        }
+        const roles = res.map(role => ({
+            name: role.title,
+            value: role.id
+        }))
 
+        inquirer
+            .prompt([
+                {
+                    type: "list",
+                    name: "role_id",
+                    message: "Which role would you like to remove from database?",
+                    choices: roles
+                }
+            ])
+            .then(response => {
+                const query = `DELETE FROM Role WHERE id=${response.role_id};`;
+                db.query(query, (err, res) => {
+                    if (err) {
+                        throw err;
+                    }
+                    console.log("Role has been deleted from database.");
+                    console.log("==================================================");
+                    loginDB();
+                })
+            })
+    })
 }
 
+// done
 function deleteDepartment() {
+    const departmentQuery = `Select * FROM Department`;
+    db.query(departmentQuery, (err, res) => {
+        if (err) {
+            throw err;
+        }
+        const departments = res.map(department => ({
+            name: department.name,
+            value: department.id
+        }))
 
+        inquirer
+            .prompt([
+                {
+                    type: "list",
+                    name: "department_id",
+                    message: "Which department would you like to remove from database?",
+                    choices: departments
+                }
+            ])
+            .then(response => {
+                const query = `DELETE FROM Department WHERE id=${response.department_id};`;
+                db.query(query, (err, res) => {
+                    if (err) {
+                        throw err;
+                    }
+                    console.log("Department has been deleted from database.");
+                    console.log("==================================================");
+                    loginDB();
+                })
+            })
+    })
 }
-
-
 
 loginDB();

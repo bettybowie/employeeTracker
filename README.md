@@ -6,10 +6,16 @@ This is a command-line application that uses Node.js, Inquirer, and MySQL, to ma
 
 ## Installation
 
-To install necessary dependencies, run the following command:
+To install necessary dependencies, run:
    
 ~~~
 npm i
+~~~
+
+To start the application on command line, run:
+
+~~~
+npm start
 ~~~
 
 ## Usage
@@ -35,8 +41,29 @@ THEN the user is prompted to enter the name, salary, and department for the role
 WHEN the user chooses to add an employee
 THEN the user is prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
 
-WHEN the user chooses to update an employee role
-THEN the user is prompted to select an employee to update and their new role and this information is updated in the database
+WHEN the user chooses to update an employee's manager
+THEN the user is prompted to select an employee to update ...
+
+WHEN the user chooses to view employees by manager
+THEN the user is prompted 
+
+WHEN the user chooses to view employees by department
+THEN the user is prompted
+
+WHEN the user chooses to delete a department
+THEN the user is prompted to select 
+
+WHEN the user chooses to delete a role
+THEN the user is prompted to select 
+
+WHEN the user chooses to delete an employee
+THEN the user is prompted to select 
+
+WHEN the user chooses to view the total utilized budget of a department
+THEN the user is prompted to select 
+
+WHEN the user chooses to quit
+THEN the user is prompted to select 
 
 ## Visual
 
