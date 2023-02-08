@@ -229,7 +229,7 @@ function updateRole() {
                         ])
                         .then(({ role_id }) => {
                             const employeeQuery = `UPDATE Employee SET ? WHERE id = ${id}`;
-                            db.query(employeeQuery, {role_id}, (err, res) => {
+                            db.query(employeeQuery, { role_id }, (err, res) => {
                                 if (err) {
                                     throw err;
                                 }
@@ -241,26 +241,26 @@ function updateRole() {
                 })
             })
     })
-}        
+}
 
 // done
 function viewAllRoles() {
-                    const query = `SELECT Role.id as ID, Role.title as Title, Department.name as Department, Role.salary as Salary 
+    const query = `SELECT Role.id as ID, Role.title as Title, Department.name as Department, Role.salary as Salary 
     FROM Role
     JOIN Department ON Role.department_id = Department.id;`;
-                    db.query(query, (err, res) => {
-                        if (err) {
-                            throw err;
-                        }
-                        console.log(res);
-                        const roles = res.map(role => ({
-                            name: role.Title,
-                            value: role.ID
-                        }))
-                        console.log(roles);
-                        loginDB();
-                    })
-                }
+    db.query(query, (err, res) => {
+        if (err) {
+            throw err;
+        }
+        console.log(res);
+        const roles = res.map(role => ({
+            name: role.Title,
+            value: role.ID
+        }))
+        console.log(roles);
+        loginDB();
+    })
+}
 
 // done
 function addRole() {
@@ -273,113 +273,184 @@ function addRole() {
             name: department.name,
             value: department.id
         }))
-   
-                    inquirer
-                        .prompt([
-                            {
-                                type: "input",
-                                name: "title",
-                                message: "What is the name for the new role?"
-                            },
-                            {
-                                type: "input",
-                                name: "salary",
-                                message: "What is the salary for the new role?"
-                            },
-                            {
-                                type: "list",
-                                name: "department_id",
-                                message: "What is the department for the new role?",
-                                choices: departments
-                            }
-                        ])
-                        .then(response => {
-                            const roleQuery = `INSERT INTO Role (title, salary, department_id)
-                            VALUES ("${response.title}", ${response.salary}, ${response.department_id})`;
-                            db.query(roleQuery, (err, res) => {
-                                if (err) {
-                                    throw err;
-                                }
-                                console.log("New role hsa been added to database.");
-                                loginDB();
-                            })
-                        })
-                    })
+
+        inquirer
+            .prompt([
+                {
+                    type: "input",
+                    name: "title",
+                    message: "What is the name for the new role?"
+                },
+                {
+                    type: "input",
+                    name: "salary",
+                    message: "What is the salary for the new role?"
+                },
+                {
+                    type: "list",
+                    name: "department_id",
+                    message: "What is the department for the new role?",
+                    choices: departments
                 }
+            ])
+            .then(response => {
+                const roleQuery = `INSERT INTO Role (title, salary, department_id)
+                            VALUES ("${response.title}", ${response.salary}, ${response.department_id})`;
+                db.query(roleQuery, (err, res) => {
+                    if (err) {
+                        throw err;
+                    }
+                    console.log("New role hsa been added to database.");
+                    loginDB();
+                })
+            })
+    })
+}
 
 // done
 function viewAllDepartments() {
-                    db.query("SELECT * FROM DEPARTMENT", (err, res) => {
-                        if (err) {
-                            throw err;
-                        }
-                        console.table(res);
-                        loginDB();
-                    })
-                }
+    db.query("SELECT * FROM DEPARTMENT", (err, res) => {
+        if (err) {
+            throw err;
+        }
+        console.table(res);
+        loginDB();
+    })
+}
 
 // done
 function addDepartment() {
-                    inquirer
-                        .prompt([
-                            {
-                                type: "input",
-                                name: "newDepartment",
-                                message: "What is the name for the new department?"
-                            }
-                        ])
-                        .then(response => {
-                            const query = `INSERT INTO Department (name)
+    inquirer
+        .prompt([
+            {
+                type: "input",
+                name: "newDepartment",
+                message: "What is the name for the new department?"
+            }
+        ])
+        .then(response => {
+            const query = `INSERT INTO Department (name)
             VALUES ("${response.newDepartment}");`;
-                            db.query(query, (err, res) => {
-                                if (err) {
-                                    throw err;
-                                }
-                                console.log(`${response.newDepartment} added to database. `);
-                                loginDB();
-                            })
-                        })
+            db.query(query, (err, res) => {
+                if (err) {
+                    throw err;
                 }
+                console.log(`${response.newDepartment} added to database. `);
+                loginDB();
+            })
+        })
+}
 
 // done
 function viewDepartmentBudget() {
-                    const query = `SELECT Department.name as Department, SUM(salary) AS Total_Budget
+    const query = `SELECT Department.name as Department, SUM(salary) AS Total_Budget
     FROM Role
     JOIN Department ON Role.department_id = Department.id
     GROUP BY department_id;`;
-                    db.query(query, (err, res) => {
-                        if (err) {
-                            throw err;
-                        }
-                        console.table(res);
-                        loginDB();
-                    })
-                }
+    db.query(query, (err, res) => {
+        if (err) {
+            throw err;
+        }
+        console.table(res);
+        loginDB();
+    })
+}
 
-
+// done
 function updateManager() {
-
+    const employeeQuery = `SELECT id, first_name, last_name, manager_id FROM Employee`;
+    db.query(employeeQuery, (err, res) => {
+        if (err) {
+            throw err;
+        }
+        const employees = res.map(employee => ({
+            name: `${employee.first_name} ${employee.last_name}`,
+            value: employee.id
+        }))
+        employees.unshift({
+            name: "N/A",
+            value: null
+        })
+        inquirer
+            .prompt([
+                {
+                    type: "list",
+                    name: "id",
+                    message: "Which employee's manager would you like to update?",
+                    choices: employees
+                },
+                {
+                    type: "list",
+                    name: "manager_id",
+                    message: "Who is the new manager for this employee?",
+                    choices: employees
                 }
-
+            ])
+            .then(response => {
+                const managerQuery = `UPDATE Employee
+                SET manager_id = ${response.manager_id}
+                WHERE id = ${response.id};
+                `;
+                db.query(managerQuery, (err, res) => {
+                    if (err) {
+                        throw err;
+                    }
+                    console.log("Employee's new manager updated.");
+                    loginDB();
+                })
+            })
+    })
+}   
+                
+// done
 function deleteEmployee() {
-
+    const employeeQuery = `SELECT id, first_name, last_name FROM Employee`;
+    db.query(employeeQuery, (err, res) => {
+        if (err) {
+            throw err;
+        }
+        const employees = res.map(employee => ({
+            name: `${employee.first_name} ${employee.last_name}`,
+            value: employee.id
+        }))
+    
+        inquirer
+            .prompt([
+                {
+                    type: "list",
+                    name: "id",
+                    message: "Which employee would you like to remove from database?",
+                    choices: employees
                 }
+            ])
+            .then(response => {
+                const deleteQuery = `DELETE FROM Employee WHERE id = ${response.id}`;
+                db.query(deleteQuery, (err, res) => {
+                    if (err) {
+                        throw err;
+                    }
+                    console.log("Employee is removed from database.");
+                    loginDB();
+                })
+            })
+    })
+}
 
 function viewEmployeeByManager() {
 
-                }
+}
 
 function viewEmployeeByDepartment() {
 
-                }
+}
 
 function deleteRole() {
 
-                }
+}
 
 function deleteDepartment() {
 
-                }
+}
 
 
 
