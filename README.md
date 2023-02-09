@@ -70,7 +70,7 @@ THEN the user will exit the employee tracker application
 
 ## Visual
 
-[Demo Video]()
+[Demo Video](https://drive.google.com/file/d/1roB_o-RRoMeYWtUY6svyisJvT0xQK51a/view)
 
 ## License
 
